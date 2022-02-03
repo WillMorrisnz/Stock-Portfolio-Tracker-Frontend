@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { LinearGradient } from "@visx/gradient";
 import { scaleTime, scaleLinear } from "@visx/scale";
 import { timeFormat, timeParse } from "d3-time-format";

@@ -14,14 +14,17 @@ const Nav = () => {
         {
             path: "/",
             name: "Home",
+            authRequired: false,
         },
         {
             path: "/portfolio",
             name: "My Portfolio",
+            authRequired: true,
         },
         {
             path: "/stock",
             name: "Stock",
+            authRequired: false,
         },
     ];
 
@@ -49,6 +52,10 @@ const Nav = () => {
                 ></img>
                 <nav hidden={!mobileTabOpen} data-visible={mobileTabOpen}>
                     {routes.map((route) => {
+                        //Check if a user is logged in and the tab requires Auth
+                        if (route.authRequired === true && !user) {
+                            return;
+                        }
                         return (
                             <Link
                                 key={route.path}
