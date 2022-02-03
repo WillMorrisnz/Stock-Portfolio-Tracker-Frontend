@@ -1,13 +1,11 @@
-import React from 'react'
+import React from "react";
 
 const StockPage = () => {
-    return(
+    return (
         <main>
-            <h2>
-                Stock Page
-            </h2>
+            <h2>Stock Page</h2>
         </main>
-    )
-}
+    );
+};
 
-export default StockPage
+export default StockPage;
