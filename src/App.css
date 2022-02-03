@@ -11,7 +11,7 @@
     --clr-charcoal: #242424;
 
     --padding: 2em;
-    --max-width: min(80%, 70em);
+    --max-width: min(80%, 80em);
 }
 
 .App-logo {
@@ -47,6 +47,11 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
 }
 
 /* Nav Styling */

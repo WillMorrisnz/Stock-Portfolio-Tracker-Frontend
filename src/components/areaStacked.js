@@ -171,7 +171,7 @@ function AreaStackedGraph({
                     top={yMax}
                     orientation={"bottom"}
                     scale={xScale}
-                    numTicks={Math.floor(xMax / 100)}
+                    numTicks={6}
                 />
                 <AxisLeft //Left
                     tickLabelProps={() => ({
@@ -194,7 +194,7 @@ function AreaStackedGraph({
                     y0={yMax}
                     y1={(d) => yScale(d[1])}
                     order={"reverse"}
-                    curve={curveMonotoneX}
+                    curve={curveLinear}
                 >
                     {({ stacks, path }) =>
                         stacks.map((stack, index) => {
@@ -224,7 +224,6 @@ function AreaStackedGraph({
                 {
                     //Loops over holdings and displays a + or - if buy or sell
                     holdings.map((holding) => {
-                        console.log(holding);
                         // if (holdingSymbols) {
                         //     return (
                         //         <g>

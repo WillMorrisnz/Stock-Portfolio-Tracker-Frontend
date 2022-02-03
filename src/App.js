@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 
 //Component Imports
 import Nav from "./components/navBar";
-// import AreaStackedGraph from './components/areaStacked';
 
 //Page Imports
 import LandingPage from "./pages/landingPage";

@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
-import history from "history/browser";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -14,6 +14,8 @@ export const AuthProvider = ({ children }) => {
         localStorage.getItem("authTokens") ? jwt_decode(localStorage.getItem("authTokens")) : null
     );
     let [loading, setLoading] = useState(true);
+
+    let navigate = useNavigate();
 
     let loginUser = async (e) => {
         e.preventDefault();
@@ -33,7 +35,7 @@ export const AuthProvider = ({ children }) => {
             setAuthTokens(data);
             setUser(jwt_decode(data.access));
             localStorage.setItem("authTokens", JSON.stringify(data));
-            history.push("/portfolio");
+            navigate("/portfolio");
         } else {
             alert("Something went wrong!");
         }
@@ -44,7 +46,7 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         localStorage.removeItem("authTokens");
         console.log("user Logged Out");
-        history.push("/login/");
+        navigate("/login");
     };
 
     let updateToken = async () => {

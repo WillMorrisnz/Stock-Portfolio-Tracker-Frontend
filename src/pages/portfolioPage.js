@@ -1,10 +1,10 @@
 import AreaStackedGraph from "../components/areaStacked";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import AuthContext from "../context/AuthContext";
 
 const PortfolioPage = () => {
     let { user } = useContext(AuthContext);
-
+    const [width, setWidth] = useState(null);
     const [portfolioValue, setPortfolioValue] = useState(0.0);
 
     const [stockSeriesData, setStockSeriesData] = useState([]);
@@ -31,6 +31,12 @@ const PortfolioPage = () => {
         "#8380b6",
         "#7DC95E",
     ]);
+
+    const ref = useRef(null);
+    useEffect(() => {
+        setWidth(ref.current.offsetWidth);
+        console.log(ref.current.height);
+    }, [ref.current]);
 
     useEffect(() => {
         if (user.user_id !== undefined) {
@@ -113,13 +119,13 @@ const PortfolioPage = () => {
     }
 
     return (
-        <main>
+        <main className="container" ref={ref}>
             <h2>Portfolio Page</h2>
             <h2>Value: {"$" + portfolioValue.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")}</h2>
             <AreaStackedGraph
                 seriesData={filteredSeriesData}
-                width={1000}
-                height={750}
+                width={width}
+                height={width * 0.75}
                 normalize={normalizeYAxis}
                 colors={colors}
                 darkMode={darkMode}
