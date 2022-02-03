@@ -2,6 +2,18 @@
   text-align: center;
 }
 
+:root{
+  --clr-medium-blue: #24BDDF;
+  --clr-bright-blue: #00D1FF;
+  --clr-dark: #394276;
+  --clr-medium-white: rgb(236, 236, 236);
+
+  --clr-charcoal: #242424;
+
+  --padding: 2em;
+  --max-width: min(80%, 70em);
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -35,4 +47,109 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+/* Nav Styling */
+
+nav {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: 3em;
+
+  margin: 0;
+  padding: 0;
+  height: 3em;
+  align-items: center;
+
+  background-color: var(--clr-charcoal);
+}
+
+.close-nav[data-visible="false"] {
+  display: none;
+}
+
+.close-nav[data-visible="true"] {
+  z-index: 9000;
+  position: fixed;
+  right: 0;
+  top: 0;
+
+  height: 100%;
+  width: 34%;
+}
+
+.mobile-nav-button {
+  display: none;
+  z-index: 9999;
+  max-width: 1.25em;
+  filter: invert(38%) sepia(99%) saturate(1849%) hue-rotate(183deg) brightness(103%) contrast(104%);}
+
+
+@media (max-width: 35em) {
+  :root{
+    --padding: 0.25em;
+    --max-width: 95%
+  }
+
+  nav {
+    z-index: 9000;
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    gap: 1em;
+    height: 100%;
+    width: 66%;
+
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    
+    background: rgba(65, 65, 65, 0.8);
+    backdrop-filter: blur(1em);
+  }
+  .mobile-nav-button {
+    display: inline-block;
+    position: fixed;
+    padding: .5em;
+    top: .5em;
+    left: .5em;
+  }
+}
+
+nav[data-visible="true"] {
+  display: flex;
+  position: fixed;
+}
+
+.nav-container {
+  width: auto;
+  height: 100%;
+}
+
+.nav-item {
+  text-decoration: none;
+  display: inline-block;
+  padding: 1em;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: large;
+  color: rgb(255, 255, 255);
+  user-select: none;
+}
+
+.nav-item-selected {
+  user-select: none;
+  text-decoration: none;
+  display: inline-block;
+  padding: 1em;
+
+  font-family: 'Roboto', sans-serif;
+  font-weight: 800;
+  font-size: large;
+  color: #0099ff;
+  text-shadow: 0 0 8px rgba(16, 112, 175, 0.5);
 }
