@@ -54,6 +54,10 @@
     margin: 0 auto;
 }
 
+/* Fonts */
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
 /* Nav Styling */
 
 nav {
@@ -157,4 +161,40 @@ nav[data-visible="true"] {
     font-size: large;
     color: #0099ff;
     text-shadow: 0 0 8px rgba(16, 112, 175, 0.5);
+}
+
+/* Headings */
+
+.stock-header {
+    min-height: 8em;
+    height: 100%;
+    padding: 1rem;
+    border-radius: 11px;
+}
+
+.stock-price {
+    text-align: right;
+    padding-top: 0.5em;
+    margin: 0 auto;
+
+    font-family: "Roboto", sans-serif;
+    font-weight: bolder;
+    font-size: 2.3rem;
+    color: white;
+    text-shadow: -0.08rem -0.08rem 0 #000, 0.08rem -0.08rem 0 #000, -0.08rem 0.08rem 0 #000,
+        0.08rem 0.08rem 0 #000;
+}
+
+.stock-title {
+    text-align: left;
+    padding-top: 1em;
+    margin: 0 auto;
+    letter-spacing: 0.1rem;
+
+    font-family: "Roboto", sans-serif;
+    font-weight: 1000;
+    font-size: xx-large;
+    color: white;
+    text-shadow: 0 0.2rem 0.2rem rgba(0, 0, 0, 0.45), -0.08rem -0.08rem 0 #000,
+        0.08rem -0.08rem 0 #000, -0.08rem 0.08rem 0 #000, 0.08rem 0.08rem 0 #000;
 }

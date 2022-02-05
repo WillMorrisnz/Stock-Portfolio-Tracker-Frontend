@@ -35,6 +35,7 @@ function AreaStackedGraph({
 }) {
     const [tooltip, setTooltip] = useState(50);
     const [hideTooltip, setHideTooltip] = useState(true);
+    const [selectedStock, setSelectedStock] = useState(null);
 
     // Graph bounds
     const margin = { top: 20, bottom: 40, left: 60, right: 20 };
@@ -120,9 +121,166 @@ function AreaStackedGraph({
         domain: [0, pointMax + pointDif],
     });
 
-    // const getHoldingYPos = ({holdingIndex, itemIndex}) => {
-    //     console.log(keys[holdingIndex], itemIndex)
-    // }
+    const hexToHSL = (H, index) => {
+        // Convert hex to RGB first
+        let r = 0,
+            g = 0,
+            b = 0;
+        if (H.length === 4) {
+            r = "0x" + H[1] + H[1];
+            g = "0x" + H[2] + H[2];
+            b = "0x" + H[3] + H[3];
+        } else if (H.length === 7) {
+            r = "0x" + H[1] + H[2];
+            g = "0x" + H[3] + H[4];
+            b = "0x" + H[5] + H[6];
+        }
+        // Then to HSL
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        let cmin = Math.min(r, g, b),
+            cmax = Math.max(r, g, b),
+            delta = cmax - cmin,
+            h = 0,
+            s = 0,
+            l = 0;
+
+        if (delta === 0) h = 0;
+        else if (cmax === r) h = ((g - b) / delta) % 6;
+        else if (cmax === g) h = (b - r) / delta + 2;
+        else h = (r - g) / delta + 4;
+
+        h = Math.round(h * 60);
+
+        if (h < 0) h += 360;
+
+        l = (cmax + cmin) / 2;
+        s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+        s = +(s * 100).toFixed(1);
+        l = +(l * 100).toFixed(1);
+        //This is kidna gross, will need to be cleaned up
+        try {
+            if (onPath(index) || hideTooltip) {
+                return "hsl(" + h + "," + s + "%," + l + "%)";
+            }
+            return "hsl(" + h + ",0%," + l + "%)";
+        } catch {
+            return "hsl(" + h + ",0%," + l + "%)";
+        }
+    };
+
+    const drawtooltip = () => {
+        if (hideTooltip) {
+            return;
+        }
+        return (
+            <g>
+                <Line
+                    from={{ x: tooltip.x, y: 0 }}
+                    to={{ x: tooltip.x, y: yMax }}
+                    stroke={darkMode ? "white" : "black"}
+                    strokeWidth={2}
+                    pointerEvents="none"
+                    strokeDasharray="5,2"
+                />
+                {keys.map((stock, index) => {
+                    if (tooltip.data !== undefined && onPath(index)) {
+                        return (
+                            <g key={stock}>
+                                {/*Inner color and white outline*/}
+                                <circle
+                                    cx={tooltip.x}
+                                    cy={yScale(tooltip.adjusted[stock])}
+                                    // cy={yScale(tooltip.data[stock])}
+                                    r={4}
+                                    fill={stockPage ? calculateColor(index) : getColor(index)}
+                                    // fill={colors[index]}
+                                    stroke={"white"}
+                                    strokeWidth={1}
+                                    pointerEvents="none"
+                                />
+                                {/*Dark outline*/}
+                                <circle
+                                    cx={tooltip.x}
+                                    cy={yScale(tooltip.adjusted[stock])}
+                                    // cy={yScale(tooltip.data[stock])}
+                                    r={6}
+                                    key={Math.random()}
+                                    fill={"transparent"}
+                                    // fill={colors[index]}
+                                    stroke={"#282b2e"}
+                                    strokeWidth={3}
+                                    pointerEvents="none"
+                                />
+                                <rect
+                                    x={tooltip.x - 90 < 0 ? tooltip.x + 30 : tooltip.x - 95}
+                                    y={tooltip.y - 20}
+                                    width={75}
+                                    height={40}
+                                    // fill={"black"}
+                                    stroke={"black"}
+                                    strokeWidth={1}
+                                    fill={keysLen === 1 ? "black" : colors[index]}
+                                    opacity={0.8}
+                                    rx={4}
+                                />
+                                <Text
+                                    style={{ fontWeight: 400, fontSize: 14 }}
+                                    x={tooltip.x - 90 < 0 ? tooltip.x + 35 : tooltip.x - 90}
+                                    y={tooltip.y}
+                                    width={75}
+                                    textAnchor="start"
+                                    verticalAnchor="middle"
+                                    fill={"white"}
+                                >
+                                    {stock +
+                                        " $" +
+                                        parseFloat(tooltip.data[stock])
+                                            .toFixed(2)
+                                            .replace(/\d(?=(\d{3})+\.)/g, "$&,")}
+                                </Text>
+                            </g>
+                        );
+                    }
+                })}
+                <rect
+                    x={
+                        tooltip.x + 90 > xMax
+                            ? tooltip.x - 85
+                            : tooltip.x - 30 < 0
+                            ? tooltip.x - 15
+                            : tooltip.x - 45
+                    }
+                    y={yMax + 5}
+                    width={90}
+                    height={30}
+                    stroke={darkMode ? "white" : "black"}
+                    strokeWidth={1}
+                    fill={darkMode ? "black" : "white"}
+                    opacity={1}
+                    rx={4}
+                />
+                <Text
+                    style={{ fontWeight: 700 }}
+                    x={
+                        tooltip.x + 90 > xMax
+                            ? tooltip.x - 40
+                            : tooltip.x - 30 < 0
+                            ? tooltip.x + 30
+                            : tooltip.x
+                    }
+                    y={yMax + margin.top + 5}
+                    width={90}
+                    textAnchor="middle"
+                    fill={darkMode ? "white" : "black"}
+                    verticalAnchor="end"
+                >
+                    {tooltipDateFormat(xScale.invert(tooltip.x))}
+                </Text>
+            </g>
+        );
+    };
 
     return (
         <svg width={width} height={height}>
@@ -137,14 +295,6 @@ function AreaStackedGraph({
             />
             <LinearGradient id="green" to="#11998e" from="#38ef7d" fromOffset={0.5} />
             <LinearGradient id="red" from="#ff4f4f" to="#db3c30" fromOffset={0.5} />
-            <rect
-                x={0}
-                y={0}
-                width={width}
-                height={height}
-                fill={darkMode ? "url(#radial)" : "transparent"}
-                rx={14}
-            />
             <Group top={margin.top} left={margin.left}>
                 <GridRows
                     scale={yScale}
@@ -202,8 +352,14 @@ function AreaStackedGraph({
                                 <g key={`series-${stack.key}`}>
                                     <path
                                         d={path(stack)}
-                                        fill={stockPage ? calculateColor(index) : getColor(index)}
+                                        fill={
+                                            stockPage
+                                                ? calculateColor(index)
+                                                : hexToHSL(getColor(index), index)
+                                        }
                                         opacity={1}
+                                        stroke={"rgba(0,0,0,50%)"}
+                                        strokeWidth={"1px"}
                                     />
                                 </g>
                             );
@@ -219,7 +375,9 @@ function AreaStackedGraph({
                     rx={14}
                     onTouchMove={toolTipHandler}
                     onMouseMove={toolTipHandler}
-                    onMouseLeave={() => setHideTooltip(true)}
+                    onMouseLeave={() => {
+                        setHideTooltip(true);
+                    }}
                 />
                 {
                     //Loops over holdings and displays a + or - if buy or sell
@@ -257,114 +415,7 @@ function AreaStackedGraph({
                         // }
                     })
                 }
-                {
-                    <g hidden={hideTooltip}>
-                        <Line
-                            from={{ x: tooltip.x, y: 0 }}
-                            to={{ x: tooltip.x, y: yMax }}
-                            stroke={darkMode ? "white" : "black"}
-                            strokeWidth={2}
-                            pointerEvents="none"
-                            strokeDasharray="5,2"
-                        />
-                        {keys.map((stock, index) => {
-                            if (tooltip.data !== undefined && onPath(index)) {
-                                return (
-                                    <g key={stock}>
-                                        {/*Inner color and white outline*/}
-                                        <circle
-                                            cx={tooltip.x}
-                                            cy={yScale(tooltip.adjusted[stock])}
-                                            // cy={yScale(tooltip.data[stock])}
-                                            r={4}
-                                            fill={
-                                                stockPage ? calculateColor(index) : getColor(index)
-                                            }
-                                            // fill={colors[index]}
-                                            stroke={"white"}
-                                            strokeWidth={1}
-                                            pointerEvents="none"
-                                        />
-                                        {/*Dark outline*/}
-                                        <circle
-                                            cx={tooltip.x}
-                                            cy={yScale(tooltip.adjusted[stock])}
-                                            // cy={yScale(tooltip.data[stock])}
-                                            r={6}
-                                            key={Math.random()}
-                                            fill={"transparent"}
-                                            // fill={colors[index]}
-                                            stroke={"#282b2e"}
-                                            strokeWidth={3}
-                                            pointerEvents="none"
-                                        />
-                                        <rect
-                                            x={tooltip.x - 90 < 0 ? tooltip.x + 30 : tooltip.x - 95}
-                                            y={tooltip.y - 20}
-                                            width={75}
-                                            height={40}
-                                            // fill={"black"}
-                                            stroke={"black"}
-                                            strokeWidth={1}
-                                            fill={keysLen === 1 ? "black" : colors[index]}
-                                            opacity={0.8}
-                                            rx={4}
-                                        />
-                                        <Text
-                                            style={{ fontWeight: 400, fontSize: 14 }}
-                                            x={tooltip.x - 90 < 0 ? tooltip.x + 35 : tooltip.x - 90}
-                                            y={tooltip.y}
-                                            width={75}
-                                            textAnchor="start"
-                                            verticalAnchor="middle"
-                                            fill={"white"}
-                                        >
-                                            {stock +
-                                                " $" +
-                                                parseFloat(tooltip.data[stock])
-                                                    .toFixed(2)
-                                                    .replace(/\d(?=(\d{3})+\.)/g, "$&,")}
-                                        </Text>
-                                    </g>
-                                );
-                            }
-                        })}
-                        <rect
-                            x={
-                                tooltip.x + 90 > xMax
-                                    ? tooltip.x - 85
-                                    : tooltip.x - 30 < 0
-                                    ? tooltip.x - 15
-                                    : tooltip.x - 45
-                            }
-                            y={yMax + 5}
-                            width={90}
-                            height={30}
-                            stroke={darkMode ? "white" : "black"}
-                            strokeWidth={1}
-                            fill={darkMode ? "black" : "white"}
-                            opacity={1}
-                            rx={4}
-                        />
-                        <Text
-                            style={{ fontWeight: 700 }}
-                            x={
-                                tooltip.x + 90 > xMax
-                                    ? tooltip.x - 40
-                                    : tooltip.x - 30 < 0
-                                    ? tooltip.x + 30
-                                    : tooltip.x
-                            }
-                            y={yMax + margin.top + 5}
-                            width={90}
-                            textAnchor="middle"
-                            fill={darkMode ? "white" : "black"}
-                            verticalAnchor="end"
-                        >
-                            {tooltipDateFormat(xScale.invert(tooltip.x))}
-                        </Text>
-                    </g>
-                }
+                {drawtooltip()}
             </Group>
         </svg>
     );

@@ -1,9 +1,10 @@
 import React from "react";
+import GraphHeader from "../components/graphHeader";
 
 const StockPage = () => {
     return (
-        <main>
-            <h2>Stock Page</h2>
+        <main style={{ margin: "10px" }}>
+            <GraphHeader />
         </main>
     );
 };
