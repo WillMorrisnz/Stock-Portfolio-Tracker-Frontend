@@ -33,7 +33,7 @@ function AreaStackedGraph({
     holdingSymbols = false,
     stockPage = false,
 }) {
-    const [tooltip, setTooltip] = useState(50);
+    const [tooltip, setTooltip] = useState(null);
     const [hideTooltip, setHideTooltip] = useState(true);
     const [selectedStock, setSelectedStock] = useState(null);
 
@@ -160,14 +160,10 @@ function AreaStackedGraph({
         s = +(s * 100).toFixed(1);
         l = +(l * 100).toFixed(1);
         //This is kidna gross, will need to be cleaned up
-        try {
-            if (onPath(index) || hideTooltip) {
-                return "hsl(" + h + "," + s + "%," + l + "%)";
-            }
-            return "hsl(" + h + ",0%," + l + "%)";
-        } catch {
-            return "hsl(" + h + ",0%," + l + "%)";
+        if (selectedStock === index || selectedStock === null) {
+            return "hsl(" + h + "," + s + "%," + l + "%)";
         }
+        return "hsl(" + h + ",0%," + l + "%)";
     };
 
     const drawtooltip = () => {
@@ -336,6 +332,21 @@ function AreaStackedGraph({
                     hideTicks={true}
                     numTicks={10}
                 />
+                {/* Bar was below area stack */}
+                <Bar
+                    x={0}
+                    y={0}
+                    width={xMax}
+                    height={yMax}
+                    fill="transparent"
+                    rx={14}
+                    onClick={() => setSelectedStock(null)}
+                    onTouchMove={toolTipHandler}
+                    onMouseMove={toolTipHandler}
+                    onMouseLeave={() => {
+                        setHideTooltip(true);
+                    }}
+                />
                 <AreaStack
                     top={margin.top}
                     keys={keys}
@@ -351,12 +362,11 @@ function AreaStackedGraph({
                             return (
                                 <g key={`series-${stack.key}`}>
                                     <path
+                                        onClick={() => {
+                                            setSelectedStock(index);
+                                        }}
                                         d={path(stack)}
-                                        fill={
-                                            stockPage
-                                                ? calculateColor(index)
-                                                : hexToHSL(getColor(index), index)
-                                        }
+                                        fill={hexToHSL(getColor(index), index)}
                                         opacity={1}
                                         stroke={"rgba(0,0,0,50%)"}
                                         strokeWidth={"1px"}
@@ -366,19 +376,7 @@ function AreaStackedGraph({
                         })
                     }
                 </AreaStack>
-                <Bar
-                    x={0}
-                    y={0}
-                    width={xMax}
-                    height={yMax}
-                    fill="transparent"
-                    rx={14}
-                    onTouchMove={toolTipHandler}
-                    onMouseMove={toolTipHandler}
-                    onMouseLeave={() => {
-                        setHideTooltip(true);
-                    }}
-                />
+
                 {
                     //Loops over holdings and displays a + or - if buy or sell
                     holdings.map((holding) => {
